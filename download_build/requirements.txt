@@ -1,0 +1,8 @@
+# Python packages to download
+datetime
+mysql.connector
+numpy
+pandas
+requests
+sqlalchemy
+elasticsearch
