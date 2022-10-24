@@ -9,31 +9,19 @@ def process_applications(cleanDataDir, filePath_application, filePath_rel_app_te
 	#relatedApplicationNumber(cleanDataDir, relApp)
 
 def application(cleanDataDir, apps):
-	apps = apps.rename(columns = {'series_code': 'seriesCode', 'id': 'appId', 
-								  'number': 'appNum', 'date': 'appFileDate', 'patent_id': 'patentId'})
-	#temp = apps.merge(patentMap, on = 'patent_id', how = 'inner')
-	apps = apps[['patentId','appId', 'seriesCode', 'appNum', 'appFileDate']]
-	# Fill na values
-	apps[['appId', 'seriesCode', 'appNum']] = apps[['appId', 'seriesCode', 'appNum']].fillna('-')
-	apps['appFileDate'] = apps['appFileDate'].fillna('1000-01-01')
-
+	apps = apps.rename(columns = {'id': 'uuid', 'number': 'app_number', 'date': 'app_file_date'})
 	apps.to_csv(cleanDataDir + 'application.tsv', sep = '\t', index=False)
 
 def relatedApplication(cleanDataDir, relApp):
 	#temp = relApp.merge(patentMap, on = 'patent_id', how = 'inner')
 	# Rename columns
-	relApp = relApp.rename(columns = {'patent_id': 'patentId', 'text': 'relAppText'})
-	# Select subset of columns
-	relApp = relApp[['patentId', 'sequence', 'relAppText']]
+	relApp = relApp.rename(columns = {'text': 'rel_app_text'})
 	# Cast text to lowercase
-	relApp['relAppText'] = relApp['relAppText'].str.lower()
-	# Fill na values
-	relApp['sequence'] = relApp['sequence'].fillna(-1)
-	relApp['relAppText'] = relApp['relAppText'].fillna('-')
+	relApp['rel_app_text'] = relApp['rel_app_text'].str.lower()
 	
 	relApp.to_csv(cleanDataDir + 'relatedApplication.tsv', sep ='\t', index=False)
 	# This dataframe is needed to create the relatedApplicationNumber table
-	return (relApp)
+	return relApp
 
 ### FUNCTIONS NOT CURRENTLY USED ###
 

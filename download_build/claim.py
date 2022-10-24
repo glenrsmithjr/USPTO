@@ -2,7 +2,7 @@ from requirements import *
 def process_claims(cleanDataDir, claim_files):
 	#patentMap = pd.read_csv(cleanDataDir + 'patentMap.tsv', sep ='\t', dtype = str)
 	for file in claim_files:
-		claims = pd.read_csv(file, sep = '\t', dtype = str, usecols = ['patent_id', 'dependent', 'sequence', 'claim_number', 'exemplary'])
+		claims = pd.read_csv(file, sep = '\t', dtype = str)
 		# Assign unique IDs to each claim based on uuid
 		# Makes identifying claims easier
 		#claims['claimId'] = claims.groupby(['uuid']).ngroup()
@@ -13,7 +13,6 @@ def claims_table(cleanDataDir, claims):
 	# Join these two tables to get the (in-house-generated) patent IDs
 	#claims = claims.merge(patentMap, on = 'patent_id', how = 'inner')
 	# Rename patent__id field
-	claims = claims.rename(columns = {'patent_id': 'patentId'})
 	# Select subset of fields
 	#claims = claims[['patentId', 'dependent', 'sequence', 'exemplary']]
 	# Fill na values

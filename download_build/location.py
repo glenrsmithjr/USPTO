@@ -4,31 +4,28 @@ def process_locations(cleanDataDir, filePath_location):
 	# The following function was needed to process rawlocation, but not the location table
 	#locations = clean_locations(locations)
 	# Fill city, state, and country with NULL when NA so that unique IDs can be assigned correctly
-	locations[['city', 'state', 'country']] = locations[['city', 'state', 'country']].fillna('-')
-	locations[['city', 'state', 'country', 'state_fips', 'county_fips']] = locations[['city', 'state', 'country', 'state_fips', 'county_fips']].replace({'NULL': '-'})
-	# Assign unique ID to locations based on city, state, country combination
-	#locations['locationId'] = locations.groupby(['city', 'state', 'country']).ngroup()
-	# Assign unique ID to each entry in the location table
-	locations['locationId'] = locations.groupby(['id']).ngroup()
+	#locations[['city', 'state', 'country']] = locations[['city', 'state', 'country']].fillna('-')
 	# Rename id column for use in locationMap
-	locations = locations.rename(columns = {'id': 'location_id'})
+	locations.rename(columns = {'id': 'uuid'}, inplace=True)
+	locations[['lat', 'long']] = locations['latlong'].str.split('|', n=2, expand=True)
+	locations.drop('latlong', axis=1, inplace=True)
+	locations.replace({"": None}, inplace=True)
+	locations.to_csv(cleanDataDir + 'location.tsv', sep = '\t', index=False)
 
-	location(cleanDataDir, locations)
-	locationMap(cleanDataDir, locations)
+	#location(cleanDataDir, locations)
+	#locationMap(cleanDataDir, locations)
 	#disLocation(cleanDataDir, locations)
+
+####### FUNCTIONS BELOW THIS LINE NOT CURRENTLY USED #######
+def locationMap(cleanDataDir, locations):
+	temp = locations[['locationId', 'location_id']]
+	temp.to_csv(cleanDataDir + 'locationMap.tsv', sep = '\t', index=False)
 
 def location(cleanDataDir, locations):
 	temp = locations[['locationId', 'city', 'state', 'country', 'latitude',	'longitude', 'county', 'state_fips', 'county_fips']]
 	temp = temp.rename(columns = {'latitude': 'lat', 'longitude': 'long', 'state_fips': 'stateFips', 'county_fips': 'countyFips'})
 
 	temp.to_csv(cleanDataDir + 'location.tsv', sep = '\t', index=False)
-
-def locationMap(cleanDataDir, locations):
-	temp = locations[['locationId', 'location_id']]
-	temp.to_csv(cleanDataDir + 'locationMap.tsv', sep = '\t', index=False)
-
-
-####### FUNCTIONS BELOW THIS LINE NOT CURRENTLY USED #######
 
 def disLocation(cleanDataDir, locations):
 	# Create lat/long fields

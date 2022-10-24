@@ -1,1 +1,15 @@
-import csv, datetime, gc, mysql.connector, multiprocessing as mp, numpy as np, pandas as pd, pathlib, os, re, requests, sqlalchemy as sql, sys, zipfile
+import csv
+import datetime
+import gc
+import json
+import mysql.connector
+import multiprocessing as mp
+import numpy as np
+import pandas as pd
+import pathlib
+import os
+import re
+import requests
+import sqlalchemy as sql
+import sys
+import zipfile

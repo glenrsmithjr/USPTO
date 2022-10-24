@@ -3,12 +3,12 @@ def process_classifications(cleanDataDir, filePath_cpc_current, filePath_ipcr, f
 	#patentMap = pd.read_csv(cleanDataDir + 'patentMap.tsv', sep = '\t', dtype = str)
 
 	cpcCurrent = pd.read_csv(filePath_cpc_current, sep = '\t', dtype = str)
-	cpcCurrent = cpcCurrent.rename(columns = {'section_id': 'cpcSectionId', 'subsection_id': 'cpcSubSectionId',
-											  'group_id': 'cpcGroupId', 'subgroup_id': 'cpcSubGroupId', 'patent_id': 'patentId'})
+	cpcCurrent = cpcCurrent.rename(columns = {'section_id': 'cpc_section_id', 'subsection_id': 'cpc_subsection_id',
+											  'group_id': 'cpc_group_id', 'subgroup_id': 'cpc_subgroup_id'})
 	# Only want the part before the '/' (ex: A63B71/146)
-	cpcCurrent['subGroupPrime'] = cpcCurrent['cpcSubGroupId'].str.split('/', n = 1, expand = True)[0]
+	cpcCurrent['sub_group_prime'] = cpcCurrent['cpc_subgroup_id'].str.split('/', n = 1, expand = True)[0]
+	cpcCurrent.to_csv(cleanDataDir + 'patentCPC.tsv', sep='\t', index=False)
 
-	patentCPC(cleanDataDir, cpcCurrent)
 	CPCsection(cleanDataDir)
 	ipc(cleanDataDir, filePath_ipcr)
 
@@ -21,19 +21,12 @@ def process_classifications(cleanDataDir, filePath_cpc_current, filePath_ipcr, f
 		3) This is the name of the file that is written to disk
 	'''
 	toChange = [
-		[filePath_cpc_subsection, 'cpcSubSectionId', 'cpcSubSectionDescription', 'CPCsubSection.tsv'],
-		[filePath_cpc_group, 'cpcGroupId', 'cpcGroupDescription', 'CPCgroup.tsv'],
-		[filePath_cpc_subgroup, 'cpcSubGroupId', 'cpcSubGroupDescription', 'CPCsubGroup.tsv']
+		[filePath_cpc_subsection, 'cpc_subsection_id', 'cpc_subsection_description', 'CPCsubSection.tsv'],
+		[filePath_cpc_group, 'cpc_group_id', 'cpc_group_description', 'CPCgroup.tsv'],
+		[filePath_cpc_subgroup, 'cpc_subgroup_id', 'cpc_subgroup_description', 'CPCsubGroup.tsv']
 	]
 	for params in toChange:
 		createCPCTables(cleanDataDir, params)
-
-def patentCPC(cleanDataDir, cpcCurrent):
-	#temp = cpcCurrent.merge(patentMap, on = 'patent_id', how = 'inner')
-	# Fill na values
-	cpcCurrent['sequence'] = cpcCurrent['sequence'].fillna(-1)
-	cpcCurrent[['cpcSectionId', 'cpcSubSectionId', 'cpcGroupId', 'cpcSubGroupId', 'subGroupPrime', 'category']] = cpcCurrent[['cpcSectionId', 'cpcSubSectionId', 'cpcGroupId', 'cpcSubGroupId', 'subGroupPrime', 'category']].fillna('-')
-	cpcCurrent.to_csv(cleanDataDir + 'patentCPC.tsv', sep = '\t', index=False)
 
 # Not created from any specific table
 def CPCsection(cleanDataDir):
@@ -48,25 +41,15 @@ def CPCsection(cleanDataDir):
 		"H": "Electricity", 
 		"Y": "General Tagging of New Technological Developments" }
 
-	df = pd.DataFrame(list(sections.items()), columns = ['cpcSectionId', 'cpcSectionDescription'])
+	df = pd.DataFrame(list(sections.items()), columns = ['cpc_section_id', 'cpc_section_description'])
 	df.to_csv(cleanDataDir + 'CPCsection.tsv', sep = '\t', index=False)
 
 def ipc(cleanDataDir, filePath_ipcr):
 	ipc = pd.read_csv(filePath_ipcr, sep = '\t', dtype = str)
-	ipc = ipc.rename(columns = {'section': 'ipcSectionId', 'ipc_class': 'ipcClassId',
-		  'subclass': 'ipcSubClassId', 'main_group': 'ipcGroupId', 'subgroup': 'ipcSubGroupId',
-		  'symbol_position': 'symbolPosition', 'classification_value': 'classValue',
-		  'classification_status': 'classStatus', 'classification_data_source': 'dataSource',
-		  'action_date': 'actionDate', 'ipc_version_indicator': 'ipcVersion', 'patent_id': 'patentId'})
+	ipc = ipc.rename(columns = {'section': 'ipc_section_id', 'ipc_class': 'ipc_class_id',
+		  						'subclass': 'ipc_sub_class_id', 'main_group': 'ipc_group_id',
+								'subgroup': 'ipc_subgroup_id', 'ipc_version_indicator': 'ipc_version'})
 
-	#temp = ipc.merge(patentMap, on = 'patent_id', how = 'inner')
-	ipc = ipc[['patentId', 'sequence', 'ipcSectionId', 'ipcClassId', 'ipcSubClassId',
-				 'ipcGroupId', 'ipcSubGroupId', 'symbolPosition', 'classValue', 'classStatus',
-				 'dataSource', 'actionDate', 'ipcVersion']]
-	# Fill na values
-	ipc['sequence'] = ipc['sequence'].fillna(-1)
-	ipc[['actionDate', 'ipcVersion']] = ipc[['actionDate', 'ipcVersion']].fillna('1000-01-01')
-	ipc[['ipcSectionId','ipcClassId','ipcSubClassId','ipcGroupId','ipcSubGroupId','symbolPosition','classValue','classStatus','dataSource']] = ipc[['ipcSectionId','ipcClassId','ipcSubClassId','ipcGroupId','ipcSubGroupId','symbolPosition','classValue','classStatus','dataSource']].fillna('-')
 	ipc.to_csv(cleanDataDir + 'patentIPC.tsv', sep = '\t', index=False)
 
 # Created from 'cpc_subsection'
@@ -77,8 +60,6 @@ def createCPCTables(cleanDataDir, params):
 	temp['title'] = temp['title'].str.lower()
 	# Rename columns
 	temp = temp.rename(columns = {'id': params[1], 'title': params[2]})
-	# Fill na values
-	temp[params[2]] = temp[params[2]].fillna('-')
 	# Save data
 	temp.to_csv(cleanDataDir + params[3], sep = '\t', index=False)
 
