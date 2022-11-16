@@ -118,6 +118,6 @@ def get_files():
 
 
 def get_claim_files():
-	return ["https://s3.amazonaws.com/data.patentsview.org/claims/claims_{}.tsv.zip".format(year)
+	return ["https://s3.amazonaws.com/data.patentsview.org/claims/g_claims_{}.tsv.zip".format(year)
 			for year in range(1976, 2022)]
 
